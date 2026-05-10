@@ -66,6 +66,10 @@ body {
   @apply !bg-white !border-slate-200 !rounded-2xl !shadow-sm;
 }
 
+.ant-card-head {
+  @apply !border-b !border-slate-100 !px-8 !py-5;
+}
+
 .ant-table-thead > tr > th {
   @apply !bg-slate-50 !text-slate-500 !font-bold !uppercase !tracking-wider !text-[11px] !border-b !border-slate-100 !py-4;
 }
@@ -107,4 +111,10 @@ body {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Auth Form Stability */
+.identity-press-auth-root button:hover {
+  color: inherit !important;
+  opacity: 0.9 !important;
 }

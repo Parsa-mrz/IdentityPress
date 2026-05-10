@@ -1,18 +1,36 @@
 import { useState, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { Form, Input, Button, Typography, Space, Alert, ConfigProvider } from 'antd';
-import { ArrowRightOutlined, SafetyOutlined, PhoneOutlined } from '@ant-design/icons';
+import { __, sprintf } from '@wordpress/i18n';
+import { Form, Input, Button, Typography, Alert, ConfigProvider, Skeleton } from 'antd';
+import { ArrowRightOutlined, SafetyOutlined } from '@ant-design/icons';
 import fa_IR from "antd/lib/locale/fa_IR";
+import useSettings from '../../hooks/useSettings';
 
 const { Title, Text } = Typography;
 
 export default function AuthForm() {
+    const { settings, loading } = useSettings();
     const [step, setStep] = useState('identifier'); // 'identifier' or 'otp'
-    const [loading, setLoading] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
     const [timer, setTimer] = useState(120);
     const [canResend, setCanResend] = useState(false);
     const [identifier, setIdentifier] = useState('');
-    const [feedback, setFeedback] = useState(null); // { type: 'error' | 'success', message: string }
+    const [feedback, setFeedback] = useState(null);
+
+    // Dynamic settings
+    const primaryColor = settings?.style?.primary_color || '#4f46e5';
+    const secondaryColor = settings?.style?.secondary_color || '#f8fafc';
+    const otpLength = parseInt(settings?.general?.otp_length || '5');
+    const loginMethod = settings?.general?.login_method || 'phone';
+
+    // Auto-hide feedback alert
+    useEffect(() => {
+        if (feedback) {
+            const timeout = setTimeout(() => {
+                setFeedback(null);
+            }, 5000);
+            return () => clearTimeout(timeout);
+        }
+    }, [feedback]);
 
     useEffect(() => {
         let interval;
@@ -34,28 +52,62 @@ export default function AuthForm() {
     };
 
     const handleSendOtp = (values) => {
-        setLoading(true);
+        setActionLoading(true);
         setFeedback(null);
-        // Mocking API call
         setTimeout(() => {
             setIdentifier(values.identifier);
             setStep('otp');
             setTimer(120);
             setCanResend(false);
-            setLoading(false);
-            setFeedback({ type: 'success', message: __('Verification code sent to your mobile.', 'identity-press') });
+            setActionLoading(false);
+            setFeedback({ type: 'success', message: __('Verification code sent successfully.', 'identity-press') });
         }, 1000);
     };
 
     const handleVerifyOtp = (values) => {
-        setLoading(true);
+        setActionLoading(true);
         setFeedback(null);
-        // Mocking API call
         setTimeout(() => {
-            setLoading(false);
+            setActionLoading(false);
             setFeedback({ type: 'success', message: __('Identity verified. Logging you in...', 'identity-press') });
         }, 1000);
     };
+
+    if (loading) {
+        return (
+            <div className="max-w-[440px] mx-auto w-full bg-white p-10 rounded-[48px] shadow-2xl shadow-slate-200/50 border border-slate-100">
+                <Skeleton active avatar paragraph={{ rows: 4 }} />
+            </div>
+        );
+    }
+
+    const getIdentifierProps = () => {
+        switch (loginMethod) {
+            case 'email_phone':
+                return {
+                    label: __('Email or Mobile Number', 'identity-press'),
+                    placeholder: __('Enter email or mobile', 'identity-press'),
+                    rules: [{ required: true, message: __('Please enter your email or mobile', 'identity-press') }]
+                };
+            case 'username':
+                return {
+                    label: __('Username', 'identity-press'),
+                    placeholder: __('Enter your username', 'identity-press'),
+                    rules: [{ required: true, message: __('Please enter your username', 'identity-press') }]
+                };
+            default:
+                return {
+                    label: __('Mobile Number', 'identity-press'),
+                    placeholder: __('Enter mobile number', 'identity-press'),
+                    rules: [
+                        { required: true, message: __('Please enter your mobile number', 'identity-press') },
+                        { pattern: /^[0-9+]{10,15}$/, message: __('Please enter a valid mobile number', 'identity-press') }
+                    ]
+                };
+        }
+    };
+
+    const identifierProps = getIdentifierProps();
 
     const renderIdentifierStep = () => (
         <div className="animate-in space-y-6">
@@ -64,29 +116,33 @@ export default function AuthForm() {
                     {__('Welcome Back', 'identity-press')}
                 </Title>
                 <Text type="secondary" className="text-sm">
-                    {__('Please enter your mobile number to continue.', 'identity-press')}
+                    {sprintf(__('Please enter your %s to continue.', 'identity-press'), identifierProps.label.toLowerCase())}
                 </Text>
             </div>
 
             <Form onFinish={handleSendOtp} layout="vertical">
                 <Form.Item 
                     name="identifier"
-                    rules={[{ required: true, message: __('Please enter your number', 'identity-press') }]}
+                    rules={identifierProps.rules}
                 >
                     <Input 
-                        placeholder={__('Mobile Number', 'identity-press')}
+                        placeholder={identifierProps.placeholder}
                         size="large"
-                        className="!h-14 !rounded-2xl !bg-slate-50 !border-slate-100 !text-center !text-lg !font-bold"
+                        style={{ backgroundColor: secondaryColor }}
+                        className="!h-14 !rounded-2xl !border-slate-100 !text-center !text-lg !font-bold"
                     />
                 </Form.Item>
 
                 <Button 
-                    type="primary" 
                     htmlType="submit" 
                     block 
                     size="large" 
-                    loading={loading}
-                    className="!h-14 !rounded-2xl !bg-indigo-600 !font-bold !text-lg !shadow-xl !shadow-indigo-100"
+                    loading={actionLoading}
+                    style={{ 
+                        backgroundColor: primaryColor,
+                        boxShadow: `0 10px 15px -3px ${primaryColor}33, 0 4px 6px -4px ${primaryColor}33`
+                    }}
+                    className="!h-14 !rounded-2xl !font-bold !text-lg !border-none"
                 >
                     {__('Get Verification Code', 'identity-press')}
                 </Button>
@@ -100,15 +156,6 @@ export default function AuthForm() {
                     className="!rounded-2xl !mt-4 animate-in"
                 />
             )}
-
-            <div className="text-center mt-8 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                <Text className="text-[11px] text-slate-500 leading-relaxed">
-                    {__('By continuing, you agree to our ', 'identity-press')}
-                    <a href="#" className="text-indigo-600 font-bold hover:underline">{__('Terms of Service', 'identity-press')}</a>
-                    {__(' and ', 'identity-press')}
-                    <a href="#" className="text-indigo-600 font-bold hover:underline">{__('Privacy Policy', 'identity-press')}</a>.
-                </Text>
-            </div>
         </div>
     );
 
@@ -119,24 +166,32 @@ export default function AuthForm() {
                     {__('Verification', 'identity-press')}
                 </Title>
                 <Text type="secondary" className="text-sm">
-                    {__('Enter the 6-digit code sent to ', 'identity-press')}
-                    <span className="font-bold text-slate-700">{identifier}</span>
+                    {sprintf(
+                        /* translators: %d: OTP Length */
+                        __('Enter the %d-digit code sent to ', 'identity-press'),
+                        otpLength
+                    )}
+                    <span className="font-bold text-slate-700 ml-1">{identifier}</span>
                 </Text>
             </div>
 
             <Form onFinish={handleVerifyOtp} layout="vertical">
                 <Form.Item 
                     name="otp"
-                    rules={[{ required: true, message: __('Please enter the full code', 'identity-press'), len: 6 }]}
+                    rules={[{ 
+                        required: true, 
+                        message: sprintf(__('Please enter the full %d-digit code', 'identity-press'), otpLength), 
+                        len: otpLength 
+                    }]}
                     className="!mb-8 flex justify-center"
                 >
                     <Input.OTP 
-                        length={6} 
+                        length={otpLength} 
                         size="large"
                         variant="filled"
                         autoFocus
                         onChange={(value) => {
-                            if (value.length === 6) {
+                            if (value.length === otpLength) {
                                 setTimeout(() => {
                                     handleVerifyOtp({ otp: value });
                                 }, 100);
@@ -154,14 +209,18 @@ export default function AuthForm() {
                                 setCanResend(false);
                                 setFeedback({ type: 'success', message: __('New code has been sent.', 'identity-press') });
                             }}
-                            className="!text-indigo-600 !font-bold hover:!text-indigo-700"
+                            style={{ color: primaryColor }}
+                            className="!font-bold hover:!opacity-80"
                         >
                             {__('Resend Verification Code', 'identity-press')}
                         </Button>
                     ) : (
-                        <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest bg-slate-50 px-4 py-2 rounded-full border border-slate-100">
+                        <div 
+                            style={{ backgroundColor: secondaryColor, borderColor: `${primaryColor}22` }}
+                            className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full border border-slate-100"
+                        >
                             <span>{__('Resend code in', 'identity-press')}</span>
-                            <span className="text-indigo-600 font-mono font-bold text-sm">
+                            <span style={{ color: primaryColor }} className="font-mono font-bold text-sm">
                                 {formatTime(timer)}
                             </span>
                         </div>
@@ -169,12 +228,15 @@ export default function AuthForm() {
                 </div>
 
                 <Button 
-                    type="primary" 
                     htmlType="submit" 
                     block 
                     size="large" 
-                    loading={loading}
-                    className="!h-14 !rounded-2xl !bg-indigo-600 !font-bold !text-lg !shadow-xl !shadow-indigo-100"
+                    loading={actionLoading}
+                    style={{ 
+                        backgroundColor: primaryColor,
+                        boxShadow: `0 10px 15px -3px ${primaryColor}33, 0 4px 6px -4px ${primaryColor}33`
+                    }}
+                    className="!h-14 !rounded-2xl !font-bold !text-lg !border-none"
                 >
                     {__('Verify Identity', 'identity-press')}
                 </Button>
@@ -189,7 +251,7 @@ export default function AuthForm() {
                     }}
                     className="!mt-4 !text-slate-400 !font-semibold hover:!text-slate-600"
                 >
-                    {__('Change Mobile Number', 'identity-press')}
+                    {__('Change Identifier', 'identity-press')}
                 </Button>
             </Form>
 
@@ -205,15 +267,35 @@ export default function AuthForm() {
     );
 
     return (
-        <ConfigProvider locale={fa_IR} direction="rtl">
-            <div className="max-w-[440px] mx-auto w-full bg-white p-10 rounded-[48px] shadow-2xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden rtl">
-                {/* Decorative Elements */}
-                <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-50 rounded-full blur-3xl opacity-50" />
-                <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-indigo-50 rounded-full blur-3xl opacity-50" />
+        <ConfigProvider 
+            locale={fa_IR} 
+            direction="rtl"
+            theme={{
+                token: {
+                    colorPrimary: primaryColor,
+                    borderRadius: 16,
+                },
+            }}
+        >
+            <div 
+                style={{ backgroundColor: secondaryColor }}
+                className="max-w-[440px] mx-auto w-full p-10 rounded-[48px] shadow-2xl shadow-slate-200/50 border border-slate-100 relative overflow-hidden rtl"
+            >
+                <div 
+                    className="absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl opacity-20" 
+                    style={{ backgroundColor: primaryColor }}
+                />
+                <div 
+                    className="absolute -bottom-24 -left-24 w-48 h-48 rounded-full blur-3xl opacity-20" 
+                    style={{ backgroundColor: primaryColor }}
+                />
 
                 <div className="relative z-10">
                     <div className="flex justify-center mb-10">
-                        <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                        <div 
+                            style={{ backgroundColor: primaryColor }}
+                            className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200"
+                        >
                             <SafetyOutlined className="text-white text-3xl" />
                         </div>
                     </div>
