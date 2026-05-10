@@ -1,6 +1,8 @@
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { message } from 'antd';
+import { notification } from 'antd';
+import { __ } from '@wordpress/i18n';
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 export default function useSettings() {
     const [settings, setSettings] = useState(null);
@@ -13,7 +15,13 @@ export default function useSettings() {
             const response = await apiFetch({ path: '/identity-press/v1/settings' });
             setSettings(response);
         } catch (error) {
-            message.error('Failed to load settings');
+            notification.error({
+                message: __('Error', 'identity-press'),
+                description: __('Failed to load settings from server.', 'identity-press'),
+                placement: 'bottomRight',
+                icon: <CloseCircleOutlined className="text-red-500" />,
+                className: ' !border-red-100 !bg-red-50'
+            });
         } finally {
             if (!silent) setLoading(false);
         }
@@ -27,10 +35,22 @@ export default function useSettings() {
                 method: 'POST',
                 data,
             });
-            message.success('Settings updated successfully');
+            notification.success({
+                message: __('Success', 'identity-press'),
+                description: __('Your changes have been saved and applied.', 'identity-press'),
+                placement: 'bottomRight',
+                icon: <CheckCircleOutlined className="text-indigo-500" />,
+                className: ' !border-indigo-100 !bg-indigo-50'
+            });
             await fetchSettings(true);
         } catch (error) {
-            message.error('Failed to save settings');
+            notification.error({
+                message: __('Save Failed', 'identity-press'),
+                description: __('Unable to sync settings with the backend.', 'identity-press'),
+                placement: 'bottomRight',
+                icon: <CloseCircleOutlined className="text-red-500" />,
+                className: ' !border-red-100 !bg-red-50'
+            });
         } finally {
             setSaving(false);
         }
@@ -44,10 +64,22 @@ export default function useSettings() {
                 method: 'POST',
                 data,
             });
-            message.success('Gateway added successfully');
+            notification.success({
+                message: __('Gateway Added', 'identity-press'),
+                description: __('The new SMS gateway is now active.', 'identity-press'),
+                placement: 'bottomRight',
+                icon: <CheckCircleOutlined className="text-indigo-500" />,
+                className: ' !border-indigo-100 !bg-indigo-50'
+            });
             await fetchSettings();
         } catch (error) {
-            message.error('Failed to add gateway');
+            notification.error({
+                message: __('Gateway Error', 'identity-press'),
+                description: __('Could not register the new provider.', 'identity-press'),
+                placement: 'bottomRight',
+                icon: <CloseCircleOutlined className="text-red-500" />,
+                className: ' !border-red-100 !bg-red-50'
+            });
         } finally {
             setSaving(false);
         }
