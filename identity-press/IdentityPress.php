@@ -28,30 +28,10 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-// Custom WordPress-compliant autoloader for the App namespace.
-spl_autoload_register(
-	function ( $requested_class ) {
-		$prefix   = 'App\\';
-		$base_dir = __DIR__ . '/app/';
 
-		$len = strlen( $prefix );
-		if ( strncmp( $prefix, $requested_class, $len ) !== 0 ) {
-				return;
-		}
-
-		$relative_class = substr( $requested_class, $len );
-		$parts          = explode( '\\', $relative_class );
-		$class_name     = array_pop( $parts );
-
-		$file_name = 'class-' . strtolower( str_replace( '_', '-', $class_name ) ) . '.php';
-
-		$path = $base_dir . implode( '/', $parts ) . ( empty( $parts ) ? '' : '/' ) . $file_name;
-
-		if ( file_exists( $path ) ) {
-			require $path;
-		}
-	}
-);
+if ( file_exists( __DIR__ . '/vendor/autoload.php' ) ) {
+	require __DIR__ . '/vendor/autoload.php';
+}
 
 
 /**
