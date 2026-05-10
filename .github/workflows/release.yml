@@ -1,0 +1,56 @@
+name: Release Plugin
+
+on:
+  push:
+    branches:
+      - 'release/*'
+      - 'main'
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build Plugin ZIP
+        run: make zip
+
+      - name: Extract Version & Determine Release Type
+        id: extract_version
+        run: |
+          VERSION=$(grep -i "^ \* Version:" identity-press/class-identitypress.php | awk '{print $3}' | tr -d '\r')
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          
+          if [[ "${{ github.ref }}" == refs/heads/main ]]; then
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            echo "tag_name=v${VERSION}" >> $GITHUB_OUTPUT
+          else
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "tag_name=v${VERSION}-rc.${{ github.run_number }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.extract_version.outputs.tag_name }}
+          name: Release ${{ steps.extract_version.outputs.tag_name }}
+          prerelease: ${{ steps.extract_version.outputs.is_prerelease == 'true' }}
+          make_latest: ${{ steps.extract_version.outputs.is_prerelease == 'false' }}
+          files: identitypress.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
