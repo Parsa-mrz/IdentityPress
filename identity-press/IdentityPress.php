@@ -1,4 +1,4 @@
-<?php
+<?php //phpcs:ignore WordPress.Files.FileName.NotHyphenatedLowercase
 /**
  * The plugin bootstrap file
  *
@@ -91,6 +91,8 @@ class IdentityPress {
 	 * @return void
 	 */
 	public function define_constant() {
+		$plugin_data = get_file_data( __FILE__, array( 'Version' => 'Version' ) );
+		define( 'IDENTITY_PRESS_VERSION', $plugin_data['Version'] );
 		define( 'IDENTITY_PRESS_PLUGIN_DIR', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 		define( 'IDENTITY_PRESS_PLUGIN_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
 		define( 'IDENTITY_PRESS_PLUGIN_FILE', __FILE__ );

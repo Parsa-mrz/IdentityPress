@@ -1,4 +1,4 @@
-<?php
+<?php //phpcs:ignore WordPress.Files.FileName.NotHyphenatedLowercase
 /**
  * The core functionality of the plugin.
  *
@@ -62,29 +62,26 @@ class Core {
 		return self::$instance;
 	}
 
-	/**
-	 * Automatically boot PHP classes in the given folders up to a defined recursion depth.
-	 *
-	 * Scans directories recursively (up to 5 levels deep by default), discovers PHP files,
-	 * and instantiates classes if they exist.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param array<int, string> $folders List of backend folder names to scan.
-	 * @param int                $max_depth Maximum recursion depth (default 5).
-	 *
-	 * @return void
-	 */
-	private function auto_boot( array $folders, int $max_depth = 5 ): void {
-		foreach ( $folders as $folder ) {
-			$base_dir       = IDENTITY_PRESS_PLUGIN_DIR . '/app/Backend/' . $folder . '/';
-			$base_namespace = "App\\$folder";
+	private function auto_boot( int $max_depth = 5 ): void {
+		$backend_dir = IDENTITY_PRESS_PLUGIN_DIR . '/app/Backend/';
+		$folders     = glob( $backend_dir . '*', GLOB_ONLYDIR );
 
-			if ( ! is_dir( $base_dir ) ) {
+		if ( ! is_array( $folders ) ) {
+			return;
+		}
+
+		$skip_folders = array( 'Models', 'Enums', 'Widgets', 'Views', 'DTOs', 'Repositories' );
+
+		foreach ( $folders as $folder_path ) {
+			$folder = basename( $folder_path );
+
+			if ( in_array( $folder, $skip_folders, true ) ) {
 				continue;
 			}
 
-			$this->scan_directory( $base_dir, $base_namespace, $max_depth );
+			$base_namespace = "App\\Backend\\$folder";
+
+			$this->scan_directory( $folder_path . '/', $base_namespace, $max_depth );
 		}
 	}
 
@@ -146,5 +143,6 @@ class Core {
 	 * @return void
 	 */
 	public function run(): void {
+		$this->auto_boot();
 	}
 }

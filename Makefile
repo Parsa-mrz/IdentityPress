@@ -1,5 +1,5 @@
 dev:
-	cd identity-press && npm run watch 
+	cd identity-press && npm run dev 
 build:
 	cd identity-press && npm run build 
 pot:
