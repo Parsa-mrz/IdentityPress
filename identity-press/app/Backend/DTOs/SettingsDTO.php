@@ -12,16 +12,22 @@ defined( 'ABSPATH' ) || exit;
  */
 class SettingsDTO {
 	/**
+	 * General settings data.
+	 *
 	 * @var array
 	 */
 	public array $general;
 
 	/**
+	 * SMS gateway settings data.
+	 *
 	 * @var array
 	 */
 	public array $gateways;
 
 	/**
+	 * Visual styling settings data.
+	 *
 	 * @var array
 	 */
 	public array $style;
@@ -29,7 +35,7 @@ class SettingsDTO {
 	/**
 	 * SettingsDTO constructor.
 	 *
-	 * @param array $data
+	 * @param array $data Raw settings data from the request.
 	 */
 	public function __construct( array $data ) {
 		$this->general  = $data['general'] ?? array();
@@ -38,7 +44,7 @@ class SettingsDTO {
 	}
 
 	/**
-	 * Convert DTO to array.
+	 * Convert the DTO to an array.
 	 *
 	 * @return array
 	 */
@@ -48,15 +54,5 @@ class SettingsDTO {
 			'gateways' => $this->gateways,
 			'style'    => $this->style,
 		);
-	}
-
-	/**
-	 * Create DTO from array.
-	 *
-	 * @param array $data
-	 * @return self
-	 */
-	public static function from_array( array $data ): self {
-		return new self( $data );
 	}
 }

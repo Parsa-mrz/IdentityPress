@@ -24,11 +24,11 @@ class SettingsRepository {
 	public function get_all(): array {
 		$defaults = array(
 			'general'  => array(
-				'login_method'      => 'phone',
-				'otp_length'        => '5',
-				'wc_replace_login'  => false,
-				'wc_lock_checkout'  => false,
-				'develop_mode'      => false,
+				'login_method'     => 'phone',
+				'otp_length'       => '5',
+				'wc_replace_login' => false,
+				'wc_lock_checkout' => false,
+				'develop_mode'     => false,
 			),
 			'gateways' => array(),
 			'style'    => array(
@@ -58,19 +58,19 @@ class SettingsRepository {
 		// update_option returns false if the value is the same as current.
 		// We should return true if update_option returns true OR if the option exists.
 		$updated = update_option( self::OPTION_NAME, $settings );
-		
+
 		return $updated || get_option( self::OPTION_NAME ) === $settings;
 	}
 
 	/**
 	 * Add a new gateway.
 	 *
-	 * @param array $gateway
+	 * @param array $gateway The gateway data to add.
 	 * @return bool
 	 */
 	public function add_gateway( array $gateway ): bool {
-		$settings = $this->get_all();
-		$gateway['id'] = uniqid('gw_');
+		$settings               = $this->get_all();
+		$gateway['id']          = uniqid( 'gw_' );
 		$settings['gateways'][] = $gateway;
 
 		return update_option( self::OPTION_NAME, $settings );

@@ -55,7 +55,7 @@ class SettingsController {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'get_settings' ),
-				'permission_callback' => array( $this, 'check_permission' ),
+				'permission_callback' => array( $this, 'check_read_permission' ),
 			)
 		);
 
@@ -68,6 +68,15 @@ class SettingsController {
 				'permission_callback' => array( $this, 'check_permission' ),
 			)
 		);
+	}
+
+	/**
+	 * Check if the current user has permission to read settings.
+	 *
+	 * @return bool
+	 */
+	public function check_read_permission(): bool {
+		return true;
 	}
 
 	/**
@@ -91,7 +100,7 @@ class SettingsController {
 	/**
 	 * Update settings for a specific group.
 	 *
-	 * @param WP_REST_Request $request
+	 * @param WP_REST_Request $request The REST request object.
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function update_settings( WP_REST_Request $request ) {

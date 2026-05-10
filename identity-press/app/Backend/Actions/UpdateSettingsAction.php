@@ -15,6 +15,8 @@ defined( 'ABSPATH' ) || exit;
  */
 class UpdateSettingsAction {
 	/**
+	 * The settings repository instance.
+	 *
 	 * @var SettingsRepository
 	 */
 	private SettingsRepository $repository;

@@ -1,6 +1,8 @@
 <?php //phpcs:ignore WordPress.Files.FileName.NotHyphenatedLowercase
 namespace App\Backend\Controllers;
 
+use App\Backend\Repositories\SettingsRepository;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -12,11 +14,19 @@ defined( 'ABSPATH' ) || exit;
  */
 class AuthFormController {
 	/**
+	 * The settings repository instance.
+	 *
+	 * @var \App\Backend\Repositories\SettingsRepository
+	 */
+	private $repository;
+
+	/**
 	 * Initialize the class and register shortcode hooks.
 	 *
 	 * @since 1.0.0
 	 */
 	public function __construct() {
+		$this->repository = new SettingsRepository();
 		add_shortcode( 'identity_press_auth', array( $this, 'render_auth_shortcode' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
 	}
@@ -29,7 +39,21 @@ class AuthFormController {
 	 */
 	public function enqueue_frontend_assets() {
 		global $post;
-		if ( ! is_a( $post, 'WP_Post' ) || ! has_shortcode( $post->post_content, 'identity_press_auth' ) ) {
+
+		$settings   = $this->repository->get_all();
+		$wc_replace = ! empty( $settings['general']['wc_replace_login'] );
+
+		$should_load = false;
+
+		if ( is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'identity_press_auth' ) ) {
+			$should_load = true;
+		}
+
+		if ( class_exists( 'WooCommerce' ) && is_account_page() && $wc_replace && ! is_user_logged_in() ) {
+			$should_load = true;
+		}
+
+		if ( ! $should_load ) {
 			return;
 		}
 
