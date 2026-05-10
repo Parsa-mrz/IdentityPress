@@ -1,4 +1,110 @@
-/* === Tailwind Base === */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --bg-main: #f8fafc;
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+}
+
+/* --- Clean Modern Layout --- */
+.admin-card {
+  @apply bg-white border border-slate-200 rounded-2xl shadow-sm transition-all duration-300;
+}
+
+.admin-card:hover {
+  @apply shadow-md border-slate-300;
+}
+
+/* --- Ant Design Modern Overrides (Clean Style) --- */
+.modern-tabs .ant-tabs-nav {
+  @apply !mb-8 !border-b !border-slate-200;
+}
+
+.modern-tabs .ant-tabs-tab {
+  @apply !m-0 !px-6 !py-4 !transition-all !duration-300 !text-slate-500 !font-semibold;
+}
+
+.modern-tabs .ant-tabs-tab:hover {
+  @apply !text-indigo-600;
+}
+
+.modern-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  @apply !text-indigo-600 !font-bold;
+}
+
+.modern-tabs .ant-tabs-ink-bar {
+  @apply !bg-indigo-600 !h-1 !rounded-full;
+}
+
+.ant-btn-primary {
+  @apply !bg-indigo-600 !border-none !shadow-sm !h-11 !rounded-xl !px-8 !font-semibold !transition-all !duration-200;
+}
+
+.ant-btn-primary:hover {
+  @apply !bg-indigo-700 !shadow-md;
+}
+
+.ant-input, .ant-select-selector, .ant-input-number, .ant-input-password {
+  @apply !rounded-xl !border-slate-200 !bg-white !h-11 !flex !items-center !transition-all !duration-200;
+}
+
+.ant-input:focus, .ant-select-focused .ant-select-selector {
+  @apply !border-indigo-500 !shadow-[0_0_0_2px_rgba(79,70,229,0.1)] !outline-none;
+}
+
+.ant-card {
+  @apply !bg-white !border-slate-200 !rounded-2xl !shadow-sm;
+}
+
+.ant-table-thead > tr > th {
+  @apply !bg-slate-50 !text-slate-500 !font-bold !uppercase !tracking-wider !text-[11px] !border-b !border-slate-100 !py-4;
+}
+
+.ant-table-tbody > tr > td {
+  @apply !border-b !border-slate-50 !py-4 !text-slate-600;
+}
+
+/* --- Switch & Select Color Sync --- */
+.ant-switch-checked {
+  @apply !bg-indigo-600;
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  @apply !bg-indigo-50 !text-indigo-600 !font-bold;
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  @apply !bg-slate-50;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  @apply !bg-indigo-600 !border-indigo-600;
+}
+
+.ant-radio-checked .ant-radio-inner {
+  @apply !border-indigo-600;
+}
+
+.ant-radio-checked .ant-radio-inner::after {
+  @apply !bg-indigo-600;
+}
+
+/* Custom Animations */
+.animate-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
