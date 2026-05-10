@@ -1,0 +1,56 @@
+services:
+  wordpress:
+    image: wordpress:latest
+    container_name: IdentityPress_wordpress
+    restart: always
+    ports:
+      - "8888:80"
+    volumes:
+      - ./wp:/var/www/html
+      - ./IdentityPress:/var/www/html/wp-content/plugins/IdentityPress
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_password
+      WORDPRESS_DB_NAME: wordpress
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mariadb:10.6
+    container_name: IdentityPress_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_password
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u wp_user -pwp_password || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: IdentityPress_phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: wp_user
+      PMA_PASSWORD: wp_password
+
+  redis:
+    image: redis:alpine
+    container_name: IdentityPress_redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+volumes:
+  db_data:
