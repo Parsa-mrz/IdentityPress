@@ -54,10 +54,7 @@ class SettingsRepository {
 	public function update_group( string $group, array $data ): bool {
 		$settings           = $this->get_all();
 		$settings[ $group ] = wp_parse_args( $data, $settings[ $group ] ?? array() );
-
-		// update_option returns false if the value is the same as current.
-		// We should return true if update_option returns true OR if the option exists.
-		$updated = update_option( self::OPTION_NAME, $settings );
+		$updated            = update_option( self::OPTION_NAME, $settings );
 
 		return $updated || get_option( self::OPTION_NAME ) === $settings;
 	}

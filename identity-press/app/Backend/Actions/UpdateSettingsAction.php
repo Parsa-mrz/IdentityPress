@@ -38,7 +38,7 @@ class UpdateSettingsAction {
 	public function execute( string $group, array $data ): bool {
 		$current_settings = $this->repository->get_all();
 
-		$settings_dto = SettingsDTO::from_array( $current_settings );
+		$settings_dto = new SettingsDTO( $current_settings );
 
 		if ( property_exists( $settings_dto, $group ) ) {
 			$settings_dto->$group = wp_parse_args( $data, $settings_dto->$group );
