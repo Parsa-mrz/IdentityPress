@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n';
-import { Form, Input, Select, Button, Switch, Card, Divider, Row, Col, Typography, Tag, Alert } from 'antd';
+import { useEffect } from '@wordpress/element';
+import { Form, Input, Select, Button, Switch, Card, Divider, Row, Col, Typography, Tag, Alert, Skeleton } from 'antd';
 import { 
     SettingOutlined, 
     SaveOutlined, 
@@ -8,10 +9,26 @@ import {
     LockOutlined,
     LoginOutlined
 } from '@ant-design/icons';
+import useSettings from '../../hooks/useSettings';
 
 const { Title, Text } = Typography;
 
 export default function GeneralSettings() {
+    const { settings, loading, saving, saveSettings } = useSettings();
+    const [form] = Form.useForm();
+
+    useEffect(() => {
+        if (settings?.general) {
+            form.setFieldsValue(settings.general);
+        }
+    }, [settings, form]);
+
+    const onFinish = (values) => {
+        saveSettings('general', values);
+    };
+
+    if (loading) return <Skeleton active className="p-8" />;
+
     return (
         <div className="space-y-8 animate-in">
             <div>
@@ -19,7 +36,7 @@ export default function GeneralSettings() {
                 <Text type="secondary">{__('Manage your authentication protocols and system security.', 'identity-press')}</Text>
             </div>
 
-            <Form layout="vertical">
+            <Form form={form} layout="vertical" onFinish={onFinish}>
                 <Row gutter={[32, 32]}>
                     <Col span={24} lg={16}>
                         <div className="space-y-6">
@@ -64,7 +81,9 @@ export default function GeneralSettings() {
                                                 <Text type="secondary" className="text-xs">{__('OTP codes will be printed to the browser console.', 'identity-press')}</Text>
                                             </div>
                                         </div>
-                                        <Switch />
+                                        <Form.Item name="develop_mode" valuePropName="checked" className="!m-0">
+                                            <Switch />
+                                        </Form.Item>
                                     </div>
                                 </div>
                             </Card>
@@ -97,7 +116,9 @@ export default function GeneralSettings() {
                                                     <Text type="secondary" className="text-xs">{__('Use IdentityPress OTP login instead of default WooCommerce login form.', 'identity-press')}</Text>
                                                 </div>
                                             </div>
-                                            <Switch name="wc_replace_login" />
+                                            <Form.Item name="wc_replace_login" valuePropName="checked" className="!m-0">
+                                                <Switch />
+                                            </Form.Item>
                                         </div>
 
                                         <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 transition-colors hover:border-slate-200 group">
@@ -108,7 +129,9 @@ export default function GeneralSettings() {
                                                     <Text type="secondary" className="text-xs">{__('Force users to authenticate before accessing the checkout page.', 'identity-press')}</Text>
                                                 </div>
                                             </div>
-                                            <Switch name="wc_lock_checkout" />
+                                            <Form.Item name="wc_lock_checkout" valuePropName="checked" className="!m-0">
+                                                <Switch />
+                                            </Form.Item>
                                         </div>
                                     </div>
                                 </div>
@@ -130,7 +153,13 @@ export default function GeneralSettings() {
                 </Row>
 
                 <div className="flex justify-end mt-10">
-                    <Button type="primary" icon={<SaveOutlined />} size="large">
+                    <Button 
+                        type="primary" 
+                        icon={<SaveOutlined />} 
+                        size="large" 
+                        htmlType="submit"
+                        loading={saving}
+                    >
                         {__('Save Settings', 'identity-press')}
                     </Button>
                 </div>

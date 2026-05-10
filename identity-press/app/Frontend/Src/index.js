@@ -6,6 +6,13 @@ import './index.css';
 import App from './App.jsx';
 import AuthForm from './features/AuthForm';
 import fa_IR from "antd/lib/locale/fa_IR";
+import apiFetch from '@wordpress/api-fetch';
+
+// Configure apiFetch
+if (window.identityPressAdmin) {
+    apiFetch.use(apiFetch.createNonceMiddleware(window.identityPressAdmin.nonce));
+    apiFetch.use(apiFetch.createRootURLMiddleware(window.identityPressAdmin.root));
+}
 
 domReady(() => {
     // Render Admin Console
