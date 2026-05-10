@@ -77,6 +77,7 @@ class AssetsController {
 				'nonce'    => wp_create_nonce( 'wp_rest' ),
 				'root'     => esc_url_raw( rest_url() ),
 				'version'  => IDENTITY_PRESS_VERSION,
+				'is_wc_active' => class_exists( 'WooCommerce' ),
 			)
 		);
 

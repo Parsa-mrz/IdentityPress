@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { Form, Input, Select, Button, Switch, Card, Divider, Row, Col, Typography, Tag } from 'antd';
+import { Form, Input, Select, Button, Switch, Card, Divider, Row, Col, Typography, Tag, Alert } from 'antd';
 import { 
     SettingOutlined, 
     SaveOutlined, 
@@ -79,26 +79,37 @@ export default function GeneralSettings() {
                                 </div>
 
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 transition-colors hover:border-slate-200 group">
-                                        <div className="flex gap-4">
-                                            <LoginOutlined className="text-slate-400 mt-1" />
-                                            <div>
-                                                <Text className="block font-bold text-slate-700">{__('Replace Login Form', 'identity-press')}</Text>
-                                                <Text type="secondary" className="text-xs">{__('Use IdentityPress OTP login instead of default WooCommerce login form.', 'identity-press')}</Text>
+                                    {!identityPressAdmin?.is_wc_active && (
+                                        <Alert
+                                            message={__('WooCommerce Not Detected', 'identity-press')}
+                                            description={__('WooCommerce must be active to enable these integration features.', 'identity-press')}
+                                            type="warning"
+                                            showIcon
+                                            className="!rounded-xl !mb-6"
+                                        />
+                                    )}
+                                    <div className={`space-y-4 ${!identityPressAdmin?.is_wc_active ? 'opacity-50 pointer-events-none' : ''}`}>
+                                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 transition-colors hover:border-slate-200 group">
+                                            <div className="flex gap-4">
+                                                <LoginOutlined className="text-slate-400 mt-1" />
+                                                <div>
+                                                    <Text className="block font-bold text-slate-700">{__('Replace Login Form', 'identity-press')}</Text>
+                                                    <Text type="secondary" className="text-xs">{__('Use IdentityPress OTP login instead of default WooCommerce login form.', 'identity-press')}</Text>
+                                                </div>
                                             </div>
+                                            <Switch name="wc_replace_login" />
                                         </div>
-                                        <Switch name="wc_replace_login" />
-                                    </div>
 
-                                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 transition-colors hover:border-slate-200 group">
-                                        <div className="flex gap-4">
-                                            <LockOutlined className="text-slate-400 mt-1" />
-                                            <div>
-                                                <Text className="block font-bold text-slate-700">{__('Lock Checkout', 'identity-press')}</Text>
-                                                <Text type="secondary" className="text-xs">{__('Force users to authenticate before accessing the checkout page.', 'identity-press')}</Text>
+                                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 transition-colors hover:border-slate-200 group">
+                                            <div className="flex gap-4">
+                                                <LockOutlined className="text-slate-400 mt-1" />
+                                                <div>
+                                                    <Text className="block font-bold text-slate-700">{__('Lock Checkout', 'identity-press')}</Text>
+                                                    <Text type="secondary" className="text-xs">{__('Force users to authenticate before accessing the checkout page.', 'identity-press')}</Text>
+                                                </div>
                                             </div>
+                                            <Switch name="wc_lock_checkout" />
                                         </div>
-                                        <Switch name="wc_lock_checkout" />
                                     </div>
                                 </div>
                             </Card>
