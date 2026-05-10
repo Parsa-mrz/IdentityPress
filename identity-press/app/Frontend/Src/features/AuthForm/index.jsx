@@ -292,12 +292,15 @@ export default function AuthForm() {
 
                 <div className="relative z-10">
                     <div className="flex justify-center mb-10">
-                        <div 
-                            style={{ backgroundColor: primaryColor }}
-                            className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200"
-                        >
-                            <SafetyOutlined className="text-white text-3xl" />
-                        </div>
+                        {settings?.style?.logo_url && (
+                            <div className="max-w-[180px] max-h-[80px] flex items-center justify-center">
+                                <img 
+                                    src={settings.style.logo_url} 
+                                    className="max-w-full max-h-full object-contain" 
+                                    alt={__('Logo', 'identity-press')} 
+                                />
+                            </div>
+                        )}
                     </div>
 
                     {step === 'identifier' ? renderIdentifierStep() : renderOtpStep()}

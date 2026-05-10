@@ -34,6 +34,7 @@ class SettingsRepository {
 			'style'    => array(
 				'primary_color'   => '#4f46e5',
 				'secondary_color' => '#f8fafc',
+				'logo_url'        => '',
 				'custom_css'      => '',
 			),
 		);

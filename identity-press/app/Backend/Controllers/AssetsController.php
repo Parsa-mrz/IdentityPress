@@ -59,6 +59,8 @@ class AssetsController {
 
 		$asset_file = include IDENTITY_PRESS_PLUGIN_DIR . '/app/Frontend/Build/index.asset.php';
 
+		wp_enqueue_media();
+
 		wp_enqueue_script(
 			'identity-press-admin-panel',
 			IDENTITY_PRESS_PLUGIN_URL . '/app/Frontend/Build/index.js',
