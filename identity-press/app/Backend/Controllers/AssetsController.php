@@ -1,14 +1,34 @@
-<?php
+<?php //phpcs:ignore WordPress.Files.FileName.NotHyphenatedLowercase
 namespace App\Backend\Controllers;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * The core functionality of the plugin.
+ *
+ * @link       https://parsamirzaie.com
+ * @since      1.0.0
+ * @package    IdentityPress
+ * @subpackage App\Backend\Controllers
+ */
 class AssetsController {
+	/**
+	 * Initialize the class and register asset hooks.
+	 *
+	 * @since 1.0.0
+	 */
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 	}
 
+	/**
+	 * Enqueue admin styles for the plugin page.
+	 *
+	 * @since 1.0.0
+	 * @param string $hook The current admin page hook.
+	 * @return void
+	 */
 	public function enqueue_admin_styles( $hook ) {
 		if ( 'toplevel_page_identity-press' !== $hook ) {
 			return;
@@ -25,6 +45,13 @@ class AssetsController {
 		);
 	}
 
+	/**
+	 * Enqueue admin scripts and localize data for the plugin page.
+	 *
+	 * @since 1.0.0
+	 * @param string $hook The current admin page hook.
+	 * @return void
+	 */
 	public function enqueue_admin_scripts( $hook ) {
 		if ( 'toplevel_page_identity-press' !== $hook ) {
 			return;
