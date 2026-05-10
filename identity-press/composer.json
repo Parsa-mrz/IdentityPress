@@ -1,0 +1,11 @@
+{
+    "name": "parsamirzaie/identity-press",
+    "autoload": {},
+    "authors": [
+        {
+            "name": "Parsa Mirzai",
+            "email": "Mirzaie_parsa@protonmail.ch"
+        }
+    ],
+    "require": {}
+}
