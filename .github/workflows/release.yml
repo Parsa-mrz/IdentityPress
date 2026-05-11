@@ -33,7 +33,7 @@ jobs:
       - name: Extract Version & Determine Release Type
         id: extract_version
         run: |
-          VERSION=$(grep -i "^ \* Version:" identity-press/class-identitypress.php | awk '{print $3}' | tr -d '\r')
+          VERSION=$(grep -m 1 "Version:" identity-press/IdentityPress.php | awk '{print $NF}' | tr -d '\r')
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "tag_name=v${VERSION}" >> $GITHUB_OUTPUT
           
